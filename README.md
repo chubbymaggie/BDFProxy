@@ -1,8 +1,41 @@
 
-#The Backdoor Factory Proxy (BDFProxy) v0.1
+#The Backdoor Factory Proxy (BDFProxy) v0.3.8
+
+
 For security professionals and researchers only.
 
-DerbyCon 2014 Presentation: http://www.youtube.com/watch?v=LjUN9MACaTs
+[![Join the chat at https://gitter.im/secretsquirrel/BDFProxy](https://badges.gitter.im/secretsquirrel/BDFProxy.svg)](https://gitter.im/secretsquirrel/BDFProxy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![Black Hat Arsenal](https://www.toolswatch.org/badges/arsenal/2015.svg)](https://www.blackhat.com/us-15/arsenal.html)
+
+
+###NOW ONLY WORKS WITH v.0.17 >= MITMPROXY >= v.0.11 
+
+Docker:
+```
+ # sudo echo 1 > /proc/sys/net/ipv4/ip_forward  # linux
+ # sudo sysctl -w net.inet.ip.forwarding=1 # macOS
+ docker pull secretsquirrel/bdfproxy
+ docker run -it -p 8080:8080 secretsquirrel/bdfproxy bash
+ # ./bdf_proxy.py
+```
+
+To install on Kali:
+
+```
+apt-get update
+apt-get install bdfproxy
+```
+
+Black Hat USA 2015:
+
+    Video: https://www.youtube.com/watch?v=OuyLzkG16Uk
+    
+    Paper: https://www.blackhat.com/docs/us-15/materials/us-15-Pitts-Repurposing-OnionDuke-A-Single-Case-Study-Around-Reusing-Nation-State-Malware-wp.pdf
+
+
+DerbyCon 2014: 
+
+    Video: http://www.youtube.com/watch?v=LjUN9MACaTs
+
 
 About 18 minutes in is the BDFProxy portion.
 
@@ -34,7 +67,7 @@ Here's a short list:
 		Wireshark
 		etc...
 
-Yes, some of those apps are protected by self checking mechanisms.  I've been working on a way to automatically bypass NSIS checks as a proof of concept.  However, that does not stop the initial issue of bitflipping during download and the execution of a malicious payload. Also, BDF by default will patch out the windows PE certificate table pointer during download thereby removing the signature from the binary.
+Yes, some of those apps are protected by self checking mechanisms.  I've been working on a way to automatically bypass NSIS checks as a proof of concept.  However, that does not stop the initial issue of bit flipping during download and the execution of a malicious payload. Also, BDF by default will patch out the windows PE certificate table pointer during download thereby removing the signature from the binary.
 
 ---
 
@@ -99,12 +132,12 @@ Wifi usage:
 		<Internet>----<mitmMachine>----<wifiPineapple>)))
 
 
-Testing:
+##Testing:
 
 	Suppose you want to use your browser with Firefox and FoxyProxy to connect to test your setup.
 
 		Update your config as follows:
-		transparentProxy = False
+		transparentProxy = None
 
 		Configure FoxyProxy to use BDFProxy as a proxy.
 		Default port in the config is 8080.
@@ -119,4 +152,41 @@ We have it.  The proxy window will quickly fill with massive amounts of cat link
 	-Arp Redirection
 	-Physical plant in a wiring closet
 	-Logical plant at your favorite ISP
+
+
+###Change Log:
+
+####07/04/2016
+
+Support for BDF Preprocessor and mitmProxy v17
+
+####12/20/2015
+
+Added configuration options in bdfproxy.cfg to support PE code signing from BDF => CODE_SIGN
+See BDF README for details
+
+
+####11/13/2015
+
+Remove python-magic dependencies because there are two libraries that are named as such.  Which is confusing.
+
+
+####10/19/2015
+
+Add support for BDF Import Directory Patching into the a code cave vs a new section.  Update IDA_IN_CAVE to True in the bdfproxy.cfg file for this.  EXPERIMENTAL...
+
+
+####8/12/2015
+
+Added support for the PE replace method, replace downloaded binary with an attacker supplied one. To use change PATCH_METHOD to replace and provide a SUPPLIED_BINARY
+
+
+####8/6/2015
+
+Added support for onionduke. To use change PATCH_METHOD to onionduke and SUPPLIED_BINARY to the binary that you wish to bind to the target executable.
+
+Added support to set the check and patching of the requestedExecutionLevel in the PE manifest as highestAvailable for both x86 and x86_64 PE binaries. Set RUNAS_ADMIN as True.
+
+Added support to set whether to support legacy XP machines via the XP_MODE flag as True.  This can have evasion against AVs as their emulators may fail if this setting is set to FALSE.
+
 
